@@ -1,0 +1,167 @@
+{
+  "name": "Text-to-Media Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "71a917a0-3dab-4b3a-9df3-09af9ef21e3e",
+      "name": "Telegram Trigger",
+      "webhookId": "83b20caf-4aff-4b1e-ba61-9da37c803985",
+      "credentials": {
+        "telegramApi": {
+          "id": "8UjQGtBxEcWyRoSM",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text.toLowerCase() }}",
+                    "rightValue": "gambar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "4f3268f3-c78c-40de-af21-2ea6b23717d6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text-to-image"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ef0b3b20-5510-408f-ad59-533097f71ac6",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash-image",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash-image (Nano Banana)"
+        },
+        "prompt": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        416,
+        -96
+      ],
+      "id": "ed50d92e-b77f-4732-9901-c51afb782234",
+      "name": "Generate an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "p9AbgftQCzESpi9r",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "7801446448",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        -112
+      ],
+      "id": "f576602f-d278-4d2c-b299-2e6e2dcb2676",
+      "name": "Send a photo message",
+      "webhookId": "67d055eb-a1ea-4421-bfff-eea00d91a115",
+      "credentials": {
+        "telegramApi": {
+          "id": "8UjQGtBxEcWyRoSM",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Generate an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "dfb74ebe-8f80-498f-a4cc-7e5358f06cab",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "84eeee32da65a7d85df8d93603f4d8641212ada127f04ddf2a19b9b88626f429"
+  },
+  "id": "DTjlQw14yTQ8tW2V",
+  "tags": []
+}
